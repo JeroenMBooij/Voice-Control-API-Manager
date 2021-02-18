@@ -1,1 +1,0 @@
-{"version":3,"file":"admin-command.service.js","sourceRoot":"","sources":["../../src/services/admin-command.service.ts"],"names":[],"mappings":";;;AAAA,MAAa,mBAAmB;IAI5B;IAEA,CAAC;IAEM,MAAM,CAAC,WAAW;QAErB,IAAI,CAAC,mBAAmB,CAAC,QAAQ,EACjC;YACI,mBAAmB,CAAC,QAAQ,GAAG,IAAI,mBAAmB,EAAE,CAAC;SAC5D;QACD,OAAO,mBAAmB,CAAC,QAAQ,CAAC;IACxC,CAAC;CAIJ;AAnBD,kDAmBC"}
