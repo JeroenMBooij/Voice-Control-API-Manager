@@ -1,7 +1,7 @@
 import { Express } from 'express';
-import swaggerUi from 'swagger-ui-express';
+import * as swaggerUi from 'swagger-ui-express';
 
-export default function useSwagger(app: Express) {
+export default function useSwagger(app: Express): void {
 
     var options = {
         swaggerOptions: {

@@ -5,15 +5,20 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "node",
+            "type": "pwa-node",
             "request": "launch",
             "name": "Launch Program",
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}\\src\\app.ts",
+            "program": "${workspaceFolder}\\dist\\app.js",
             "outFiles": [
                 "${workspaceFolder}/**/*.js"
+            ],
+            "sourceMaps": true,
+            "resolveSourceMapLocations": [
+                "${workspaceFolder}/**",
+                "!**/node_modules/**"
             ]
         }
     ]

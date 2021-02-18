@@ -6,9 +6,35 @@
     ],
     "spec": {
       "basePath" : "/",
-      "description": "This API facilitates testing cloudservices homework",
+      "description": "<b>This API facilitates custom voice commands to execute the corresponding configured API endpoint</b>",
       "outputDirectory": "dist/api/public",
-      "specVersion": 3
+      "specVersion": 3,
+      "specMerging": "recursive",
+      "spec":{
+        "paths": {
+          "/commands/execute": {
+            "post": {
+              "description": "<b>Upload a command as a mono recording formatted to a wav file with 16kHz</b> <br> <b>The endpoint corresponding to the command will be executed.</b>",
+              "requestBody": {
+                "required": true,
+                "content": {
+                  "multipart/form-data": {
+                    "schema": {
+                      "type":"object",
+                      "properties":{
+                        "voiceCommand":{
+                          "type": "string",
+                          "format": "binary"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     },
     "routes": {
       "routesDir": "src/api"

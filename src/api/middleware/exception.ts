@@ -1,6 +1,6 @@
 import {Express, Request, Response, NextFunction} from 'express';
 
-export default function useExceptionFilter(app: Express) {
+export default function useExceptionFilter(app: Express): void {
 
       // catch 404 and forward to error handler
     app.use((request: Request, response: Response, next: NextFunction) => {

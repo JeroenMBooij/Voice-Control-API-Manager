@@ -8,11 +8,14 @@
     "outDir": "./dist",                        /* Redirect output structure to the directory. */
     "rootDir": "./src",                       /* Specify the root directory of input files. Use to control the output directory structure with --outDir. */
     "moduleResolution": "node",            /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */
-    "esModuleInterop": true,                  /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */
     "skipLibCheck": true,                     /* Skip type checking of declaration files. */
-    "forceConsistentCasingInFileNames": true,  /* Disallow inconsistently-cased references to the same file. */
-    "experimentalDecorators": true,
-    "resolveJsonModule": true
+    "forceConsistentCasingInFileNames": false,  /* Disallow inconsistently-cased references to the same file. */
+    "experimentalDecorators": true,             /*Enable TSOA decorators*/
+    "sourceMap": true                         /* Generates corresponding '.map' file. */
+  },
+  "include": [
+    "src/**/*.ts",
+  ]
     
     // "incremental": true,                   /* Enable incremental compilation */
     // "lib": [],                             /* Specify library files to be included in the compilation. */
@@ -21,7 +24,6 @@
     // "jsx": "preserve",                     /* Specify JSX code generation: 'preserve', 'react-native', or 'react'. */
     // "declaration": true,                   /* Generates corresponding '.d.ts' file. */
     // "declarationMap": true,                /* Generates a sourcemap for each corresponding '.d.ts' file. */
-    // "sourceMap": true,                     /* Generates corresponding '.map' file. */
     // "outFile": "./",                       /* Concatenate and emit output to single file. */
     
     // "composite": true,                     /* Enable project compilation */
@@ -73,5 +75,5 @@
 
     /* Advanced Options */
 
-  }
+  
 }

@@ -1,11 +1,11 @@
 {
-  "name": "testapp",
+  "name": "custom_voice_commands",
   "version": "1.0.0",
   "description": "",
-  "main": "src/app.ts",
+  "main": "index.js",
   "scripts": {
-    "dev": "concurrently \"tsoa spec-and-routes\" \"tsoa swagger\" \"tsc --watch\" \"node --experimental-specifier-resolution=node dist/app.js\"",
-    "start": "node --experimental-specifier-resolution=node dist/app.js",
+    "dev": "concurrently \"tsoa spec-and-routes\" \"tsoa swagger\" \"tsc --watch\" \"node dist/app.js\"",
+    "start": "node dist/app.js",
     "build": "tsc -p .",
     "tsoa": "tsoa spec-and-routes && tsc",
     "swagger": "tsoa swagger"
@@ -14,11 +14,18 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.21.1",
     "commonjs": "0.0.1",
     "concurrently": "^5.3.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
+    "express-fileupload": "^1.2.1",
+    "express-ws": "^4.0.0",
+    "flatted": "^3.1.1",
+    "microsoft-cognitiveservices-speech-sdk": "^1.15.1",
+    "mongoose": "^5.11.15",
     "morgan": "^1.10.0",
+    "multer": "^1.4.2",
     "swagger-ui-express": "^4.1.6",
     "tsoa": "^3.5.1"
   },

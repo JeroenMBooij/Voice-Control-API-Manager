@@ -2,8 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TestService = void 0;
 class TestService {
-    constructor() {
-    }
+    constructor() { }
     static getInstance() {
         if (!TestService.instance) {
             TestService.instance = new TestService();
@@ -33,3 +32,4 @@ class TestService {
     }
 }
 exports.TestService = TestService;
+//# sourceMappingURL=test.service.js.map
