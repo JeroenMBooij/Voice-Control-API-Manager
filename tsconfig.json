@@ -11,10 +11,12 @@
     "skipLibCheck": true,                     /* Skip type checking of declaration files. */
     "forceConsistentCasingInFileNames": false,  /* Disallow inconsistently-cased references to the same file. */
     "experimentalDecorators": true,             /*Enable TSOA decorators*/
-    "sourceMap": true                         /* Generates corresponding '.map' file. */
+    "emitDecoratorMetadata": true,              /*TypeGoose metadata reflection*/
+    "sourceMap": true,                         /* Generates corresponding '.map' file. */
+    "esModuleInterop": true
   },
   "include": [
-    "src/**/*.ts",
+    "src/**/*.ts", "tests/test-master.spec.js", "tests/admin-order.spec.js",
   ]
     
     // "incremental": true,                   /* Enable incremental compilation */

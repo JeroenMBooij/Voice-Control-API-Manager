@@ -9,10 +9,17 @@
       "description": "<b>This API facilitates custom voice commands to execute the corresponding configured API endpoint</b>",
       "outputDirectory": "dist/api/public",
       "specVersion": 3,
+      "securityDefinitions": {
+        "jwt": {
+            "type": "apiKey",
+            "name": "x-access-token",
+            "in": "header"
+        }
+      },
       "specMerging": "recursive",
       "spec":{
         "paths": {
-          "/commands/execute": {
+          "/orders/execute-voice-command": {
             "post": {
               "description": "<b>Upload a command as a mono recording formatted to a wav file with 16kHz</b> <br> <b>The endpoint corresponding to the command will be executed.</b>",
               "requestBody": {
@@ -37,6 +44,7 @@
       }
     },
     "routes": {
+      "authenticationModule": "src/api/middleware/authentication.middleware.ts",
       "routesDir": "src/api"
     }
   }

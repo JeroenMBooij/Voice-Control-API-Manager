@@ -1,16 +1,8 @@
 import { Express } from 'express';
-import startExpress from './express';
-import useSwagger from './swagger';
-import useExceptionFilter from './exception'
+import useExceptionFilter from './exception.middleware'
 
-export default (app: Express): void => {
-
-  startExpress(app);
-  console.log('✌️ Express loaded.');
-
-  useSwagger(app);
-  console.log('📗 Swagger loaded.');
-
+export default function(app: Express): void {
   useExceptionFilter(app);
-  console.log('🔥 ExceptionFilter loaded.');
+
+  console.log('🔥 Middleware Assembled.');
 };

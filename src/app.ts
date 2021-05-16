@@ -1,28 +1,25 @@
 import config from './api/build/config';
-import * as express from 'express';
-import * as mongoose from 'mongoose';
+import * as http from 'http';
+import { createServer } from "./api/server";
+import openWebsocket from "./api/websocket";
+import { connectDatabase } from "./api/database";
 
-async function startServer() 
+
+
+async function startServer()
 {
-  const app = express();
-
-  await require('./api/middleware').default(app);
+    let server: http.Server = http.createServer(createServer());
+    connectDatabase();
+     
+    server.listen(config.port, () => {
+        console.log(`
+          ################################################
+          🛡️       Server listening on port: ${config.port}       🛡️ 
+          ################################################
+          `);
+      });
   
-  await mongoose.connect(config.MONGO_CONNECTION, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(() => console.log("🚀 Connected to Mongodb."))
-    .catch((error: any) => { throw new Error(`Failed to connect to Mongodb 💔 ${error}`); } );
-  
-
-  app.listen(config.port, () => 
-  {
-    console.log(`
-      ################################################
-      🛡️       Server listening on port: ${config.port}       🛡️ 
-      ################################################
-    `);
-  });
-
-
+      openWebsocket(server);
 }
 
 startServer();

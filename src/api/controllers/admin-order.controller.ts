@@ -1,49 +1,56 @@
 import 
 {
+    Request,
     Controller,
-    Get,
     Route,
     Tags,
     Post,
-    Patch,
+    Put,
     Delete,
     Body,
-    Request,
-    SuccessResponse
+    SuccessResponse,
+    Security
 } from "tsoa";
 import * as express from "express";
-import * as multer from "multer";
-
+import * as AppUser from "../../common/constants/user.constants";
 import { AdminOrderService } from "../../services/admin-order.service";
-import { Order } from "../../models/contract-models/order";
-import { OrderDo } from "../../models/domain-objects/order.do";
+import { OrderMap } from "../../models/maps/order.map";
+import { ApplicationUser } from "../../models/user.model";
+import { OrderResult } from "../../models/order-result.model";
 
 @Tags("Admin Commands")
+@Security(AppUser.JWT_SECURITY, [AppUser.ADMIN_ROLE])
 @Route("admin/commands")
 export class AdminOrderController extends Controller 
 {
 
     @Post('create')
     @SuccessResponse('201', 'Created')
-    public async CreateCommand(@Body() order: Order): Promise<any> 
+    public async CreateCommand(@Request() request: express.Request, @Body() ordermap: OrderMap): Promise<OrderResult> 
     {
-        let challengeResult = AdminOrderService.getInstance().createOrder(new OrderDo(order));
+        const applicationUser = (request as any).applicationUser as ApplicationUser;
+
+        let challengeResult = await AdminOrderService.getInstance().createOrder(applicationUser, ordermap);
 
         this.setStatus(201);
 
         return challengeResult;
     }
 
-    @Patch('update/{orderId}')
-    public async UpdateCommand(orderId: number, @Body() order: Order): Promise<void> 
+    @Put('update/{orderId}')
+    public async UpdateCommand(@Request() request: express.Request, orderId: String, @Body() ordermap: OrderMap): Promise<void> 
     {
-        
+        const applicationUser = (request as any).applicationUser as ApplicationUser;
+
+        await AdminOrderService.getInstance().UpdateOrder(applicationUser, orderId, ordermap);
     }
 
     @Delete('delete/{orderId}')
-    public async DeleteCommand(orderId: number): Promise<void> 
+    public async DeleteCommand(@Request() request: express.Request, orderId: String): Promise<void> 
     {
+        const applicationUser = (request as any).applicationUser as ApplicationUser;
         
+        await AdminOrderService.getInstance().deleteOrder(applicationUser, orderId)
     }
 
 

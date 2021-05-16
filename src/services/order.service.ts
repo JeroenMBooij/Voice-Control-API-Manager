@@ -1,10 +1,19 @@
 import { OrderValidator } from "../validators/order.validator";
 import * as speechSdk from "microsoft-cognitiveservices-speech-sdk";
 import config from '../api/build/config';
+import { Order, OrderModel } from "../models/order.model";
+import { ApplicationUser } from "../models/user.model";
+import { ApiError } from "../common/extensions/error.extention";
+import { OrderMap } from "../models/maps/order.map";
+import { MapperService } from "./mapper.service";
+import { PaginatedOrders } from "../models/order-pagination.model";
+import { Invoice, InvoiceModel } from "../models/Invoice.model";
+import * as AppUser from "../common/constants/user.constants";
+import { Parameter } from "../models/parameter.model";
+
 
 export class OrderService 
 {
-
     private static instance: OrderService;
     private speechConfig: speechSdk.SpeechConfig;
 
@@ -16,25 +25,115 @@ export class OrderService
         {
             OrderService.instance = new OrderService();
             OrderService.instance.speechConfig = speechSdk.SpeechConfig.fromSubscription(config.MsSpeechKey, config.MsSpeechLocation);
-            OrderService.instance.speechConfig.speechRecognitionLanguage = "nl-NL";
         }
         return OrderService.instance;
     }
 
-    public async executeOrder(file: any) : Promise<any>
+    public async executeOrder(user: ApplicationUser, file: any) : Promise<any>
     {
         OrderValidator.getInstance().validateFile(file);
-
-        let command: string;
-        try
+        
+        this.speechConfig.speechRecognitionLanguage = user.language;
+        let command: string = (await this.speechToText(file.buffer.slice(0))).replace(".", "");
+        
+        
+        let orders: Order[] = new Array();
+        let invoices: Invoice[] = new Array();
+        if(user.role === AppUser.ADMIN_ROLE)
         {
-            command = await this.speechToText(file.buffer.slice(0));
-        } 
-        catch(error: any)
+            let garbageOrders = await OrderModel.find({adminId: user._id });
+            garbageOrders.forEach(item => {
+                orders.push(new OrderModel(item));
+            });
+        }
+        else
         {
-            throw new Error(error);
+            let garbage = await InvoiceModel.find({_id: { $in: user.invoiceIds } });
+            garbage.forEach(item => {
+                invoices.push(new InvoiceModel(item));
+            });
+            
+            let garbageOrders = await OrderModel.find({_id: { $in: invoices.map(s => s.orderId) } });
+            garbageOrders.forEach(item => {
+                orders.push(new OrderModel(item));
+            });
+            
         }
 
+        let order = this.findOrderByCommand(command, orders);
+
+        if(order === undefined)
+        {
+            throw new ApiError(400, `No purchased order found for the command: ${command}`);
+        }
+
+        
+        this.setOrderQueryParameters(order, command);
+
+        let invoice = invoices.find(s => s.orderId === order._id);
+        if(invoice !== undefined)
+        {
+            if(invoice.callsLeft === 0)
+            {
+                throw new ApiError(400, `No more calls left for ${command}`);
+            }
+
+            invoice.callsLeft--; 
+        }
+        let result: any = await OrderValidator.getInstance().challengeEndpoint(order.action);
+
+
+
+        return result;
+    }
+    
+    public async getOrders(user: ApplicationUser, startIndex: number = 0, endIndex: number = 49): Promise<PaginatedOrders>
+    {
+        let orders: Order[] = new Array();
+        let garbage = await OrderModel.find({ adminId: user.adminId });
+        garbage.forEach(item => {
+            orders.push(new OrderModel(item));
+        });
+
+        let pagOrders = new PaginatedOrders();
+        pagOrders.total = orders.length;
+
+        orders = orders.slice(startIndex, endIndex + 1);
+        
+        pagOrders.orders = MapperService.getInstance().orderArrayToOrderMapArray(orders);
+
+        return pagOrders;
+    }
+
+    public async getOrder(user: ApplicationUser, orderId: String): Promise<OrderMap>
+    {
+        let order: Order = await OrderModel.findOne({_id: orderId, adminId: user.adminId });
+
+        if(order == null)
+        {
+            throw new ApiError(400, "Invalid OrderId provided.");
+        }
+
+        return MapperService.getInstance().orderToOrderMap(order);
+    }
+
+    public async GetAdminOrderHeaderValue(adminId: number, orderId: number, headerKey: string): Promise<string>
+    {
+        let order: Order = await OrderModel.findOne({_id: orderId, adminId: adminId });
+
+        if(order === undefined)
+        {
+            throw new ApiError(400, "Invalid OrderId and or adminId provided.");
+        }
+
+        let headerValue = order.action.headers[headerKey];
+
+        if(headerValue == null)
+        {
+            throw new ApiError(400, "Invalid header key provided");
+        }
+
+        return headerValue;
     }
 
     private async speechToText(arrayBuffer: ArrayBuffer): Promise<string>
@@ -52,7 +151,7 @@ export class OrderService
                 {
                     case speechSdk.ResultReason.RecognizedSpeech:
                         console.log(`RECOGNIZED: ${result.text}`);
-                        resolve(result.text);
+                        resolve(result.text.toLowerCase());
                         break;
 
                     case speechSdk.ResultReason.NoMatch:
@@ -72,6 +171,44 @@ export class OrderService
                 }
             });
         });
+    }
+    
+    private findOrderByCommand(command: string, orders: Order[]): Order
+    {
+        let commandOrder: Order;
+        let commandArray = command.split(' ');
+        orders.forEach(order => {
+            let currentCommandArray = commandArray;
+
+            order.parameterLocations.forEach(index => {
+                currentCommandArray.splice(index, 1);
+            });
+
+            let uniqueCommand: string = currentCommandArray.join(' ');
+
+            if(JSON.stringify(order.uniqueCommand) === JSON.stringify(uniqueCommand))
+            {
+                commandOrder = order;
+            }
+        });
+
+        return commandOrder;
+    }
+    
+    private setOrderQueryParameters(order: Order, command: string): void
+    {
+        let commandArray = command.split(' ');
+        let templateCommand = order.command.split(' ');
+        
+        order.parameterLocations.forEach(index => {
+            let key = templateCommand[index].replace("{", "").replace("}", "");
+            let value = commandArray[index];
+
+            let parameter = order.action.queryParameters.find(parameter => parameter.key == key);
+            if(parameter != null)
+                parameter.value = value;
+        });
+        
     }
 
 

@@ -1,7 +1,7 @@
-import { Parameter } from "../models/contract-models/parameter";
 import axios, { AxiosInstance } from "axios";
-import * as httpMethods from "../common/constants/http-methods";
-import { EndpointDo } from "../models/domain-objects/endpoint.do";
+import * as httpMethods from "../common/constants/http-methods.constants";
+import { Endpoint } from "../models/endpoint.model";
+import { Parameter } from "../models/parameter.model";
 
 export class OrderValidator 
 {
@@ -24,49 +24,31 @@ export class OrderValidator
         {
             case "audio/wav":
                 return;
+            case "audio/wave":
+                return;
 
             default:
                 throw new Error(`${file.mimetype} is not a supported file format.`);
         }
     }
 
-    public validateCommandParameters(command: string, action: EndpointDo): void
+    public validateCommandQueryParameters(commandParameters: RegExpMatchArray, queryParameters: Parameter[])
     {
-        let commandParameters: RegExpMatchArray | null = command.match(/{.*}/g);
-
-        //no validation required for commands without parameters
-        if(commandParameters === null)
-        {
-            return;
-        }
-
-        if(action.queryParameters !== undefined)
-        {
-            this.validateCommandQueryParameters(commandParameters, action.queryParameters);
-            return;
-        }
-
-        this.validateBody(commandParameters, action.body);
-        
-    }
-
-    private validateCommandQueryParameters(commandParameters: RegExpMatchArray, queryParameters: Parameter[])
-    {
-        if(commandParameters.length !== queryParameters.length)
-        {
-            throw new Error("Command parameters and action parameters count don't match");
-        }
-
+        let queryParameterKeys = new Array();
         queryParameters.forEach((parameter: Parameter) => 
         {
-            if(!commandParameters.includes(parameter.property))
+            queryParameterKeys.push(`{${parameter.key}}`);
+        });
+
+        commandParameters.forEach((commandParameter: string) => {
+            if(!queryParameterKeys.includes(commandParameter))
             {
-                throw new Error(`There is no command parameter defined for ${parameter.property}`);
+                throw new Error(`There is no parameter defined for ${commandParameter}`);
             }
         });
     }
 
-    private validateBody(commandParameters: RegExpMatchArray, body: object)
+    public validateCommandToBody(commandParameters: RegExpMatchArray, body: object)
     {
         let bodyParameters: string[] = new Array();
         this.traverseBody(body, bodyParameters);
@@ -93,35 +75,38 @@ export class OrderValidator
     }
 
    
-    public async challengeEndpoint(action: EndpointDo): Promise<any>
+    public async challengeEndpoint(action: Endpoint): Promise<any>
     {
         let client: AxiosInstance = axios.create({
-            baseURL: action.host,
-            headers: action.headers
+            baseURL: action.host
         });
+
+        action.headers?.forEach((header) => {
+            client.defaults.headers.common[header.key] = header.value;
+        })
 
         let result: any;
         try{
             switch(action.method.toUpperCase())
             {
                 case httpMethods.GET:
-                    result = await client.get(action.urlWithQueryString);
+                    result = await client.get(this.queryString(action));
                     break;
                 
                 case httpMethods.POST:
-                    result = await client.post(action.url, action.body);
+                    result = await client.post(action.requestLine, action.body);
                     break;
                 
                 case httpMethods.PUT:
-                    result = await client.put(action.url, action.body);
+                    result = await client.put(action.requestLine, action.body);
                     break;
 
                 case httpMethods.PATCH:
-                    result = await client.patch(action.url, action.body);
+                    result = await client.patch(action.requestLine, action.body);
                     break;
                 
                 case httpMethods.DELETE:
-                    result = await client.delete(action.urlWithQueryString);
+                    result = await client.delete(this.queryString(action));
                     break;
                 
                 default:
@@ -134,6 +119,23 @@ export class OrderValidator
         }
 
         return result.data ?? result;
+    }
+
+    private queryString(action: Endpoint): string
+    {
+        if(action.queryParameters !== undefined)
+        {
+            let queryString = action.requestLine;
+            action.queryParameters.forEach((parameter: Parameter) =>
+            {
+                let test = `{${parameter.key}}`;
+                queryString = queryString.replace(test, parameter.value);
+            });
+
+            return queryString;
+        }
+
+        return action.requestLine;
     }
 
     
