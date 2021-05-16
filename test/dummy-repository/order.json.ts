@@ -12,7 +12,7 @@ export let firstOrder = {
       "queryParameters": [
         {
           "key": "breed",
-          "value": "beagle"
+          "value": "redbone"
         }
       ]
     }
@@ -28,7 +28,7 @@ export let secondOrder = {
       "queryParameters": [
         {
           "key": "breed",
-          "value": "beagle"
+          "value": "redbone"
         }
       ]
     }
@@ -44,7 +44,7 @@ export let secondOrder = {
       "queryParameters": [
         {
           "key": "breed",
-          "value": "beagle"
+          "value": "redbone"
         }
       ]
     }
@@ -60,7 +60,7 @@ export let secondOrder = {
       "queryParameters": [
         {
           "key": "breed",
-          "value": "beagle"
+          "value": "redbone"
         }
       ]
     }
@@ -76,7 +76,7 @@ export let secondOrder = {
       "queryParameters": [
         {
           "key": "breed",
-          "value": "beagle"
+          "value": "redbone"
         }
       ]
     }
@@ -92,7 +92,7 @@ export let secondOrder = {
       "queryParameters": [
         {
           "key": "bre ed",
-          "value": "beagle"
+          "value": "redbone"
         }
       ]
     }
