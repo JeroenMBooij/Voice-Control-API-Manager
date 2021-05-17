@@ -8,6 +8,8 @@ import { connectDatabase } from "./api/database";
 
 async function startServer()
 {
+    require('dotenv').config();
+
     let server: http.Server = http.createServer(createServer());
     connectDatabase();
      

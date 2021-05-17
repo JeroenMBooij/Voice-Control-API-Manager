@@ -24,7 +24,7 @@ export class OrderService
         if (!OrderService.instance) 
         {
             OrderService.instance = new OrderService();
-            OrderService.instance.speechConfig = speechSdk.SpeechConfig.fromSubscription(config.MsSpeechKey, config.MsSpeechLocation);
+            OrderService.instance.speechConfig = speechSdk.SpeechConfig.fromSubscription(process.env.MsSpeechKey, process.env.MsSpeechLocation);
         }
         return OrderService.instance;
     }

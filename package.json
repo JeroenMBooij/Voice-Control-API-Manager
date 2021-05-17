@@ -7,13 +7,14 @@
     "dev": "concurrently \"tsoa spec-and-routes\" \"tsoa swagger\" \"tsc --watch\" \"node dist/app.js\"",
     "debug": "concurrently \"tsc -p .\" \"tsoa spec-and-routes\" \"tsc -p .\" \"tsoa swagger\"",
     "start": "node dist/app.js",
+    "deploy": "tsc -p . && tsoa spec-and-routes && tsc -p . && tsoa swagger && node dist/app.js",
     "build": "tsc -p .",
     "tsoa": "tsoa spec-and-routes && tsc",
     "swagger": "tsoa swagger",
     "test": "mocha --check-leaks -r ts-node/register \"test/**/*.spec.ts\" --exit --timeout 10000"
   },
   "engines": {
-      "node": "14.x"
+    "node": "14.x"
   },
   "keywords": [],
   "author": "",
@@ -23,8 +24,9 @@
     "axios": "^0.21.1",
     "commonjs": "0.0.1",
     "concurrently": "^5.3.0",
+    "copyfiles": "^2.4.1",
     "cors": "^2.8.5",
-    "dotenv": "^8.2.0",
+    "dotenv": "^8.6.0",
     "express": "^4.17.1",
     "express-fileupload": "^1.2.1",
     "express-ws": "^4.0.0",

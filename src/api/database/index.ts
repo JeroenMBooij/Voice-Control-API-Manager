@@ -8,14 +8,14 @@ export function connectDatabase(): void {
     {
         const mockgoose = new Mockgoose(mongoose);
         mockgoose.prepareStorage().then(function() {
-            mongoose.connect(config.MONGO_CONNECTION, { useNewUrlParser: true, useUnifiedTopology: true })
+            mongoose.connect(process.env.MONGO_CONNECTION, { useNewUrlParser: true, useUnifiedTopology: true })
                 .then(() => console.log("✔️  Connected to Mongodb."))
                 .catch((error: any) => { throw new Error(`Failed to connect to test Mongodb 💔 ${error}`); } );
         });
     }
     else
     {
-        mongoose.connect(config.MONGO_CONNECTION, { useNewUrlParser: true, useUnifiedTopology: true })
+        mongoose.connect(process.env.MONGO_CONNECTION, { useNewUrlParser: true, useUnifiedTopology: true })
             .then(() => console.log("✔️ Connected to Mongodb."))
             .catch((error: any) => { throw new Error(`Failed to connect to Mongodb 💔 ${error}`); } );
     }
