@@ -1,12 +1,12 @@
 {
   "name": "custom_voice_commands",
   "version": "1.0.0",
-  "description": "",
+  "description": "Manage voice command to your api's",
   "main": "index.js",
   "scripts": {
     "dev": "concurrently \"tsoa spec-and-routes\" \"tsoa swagger\" \"tsc --watch\" \"node dist/app.js\"",
     "debug": "concurrently \"tsc -p .\" \"tsoa spec-and-routes\" \"tsc -p .\" \"tsoa swagger\"",
-    "start": "npm install -f && concurrently \"tsc -p .\" \"tsoa spec-and-routes\" \"tsc -p .\" \"tsoa swagger\" && node dist/app.js",
+    "start": "npm install && concurrently \"tsc -p .\" \"tsoa spec-and-routes\" \"tsc -p .\" \"tsoa swagger\" && node dist/app.js",
     "build": "tsc -p .",
     "tsoa": "tsoa spec-and-routes && tsc",
     "swagger": "tsoa swagger",
@@ -39,6 +39,7 @@
     "mongoose": "^5.10.18",
     "morgan": "^1.10.0",
     "multer": "^1.4.2",
+    "npm-install-peers": "^1.2.2",
     "socket-io": "^1.0.0",
     "swagger-ui-express": "^4.1.6",
     "tsoa": "^3.5.1",
