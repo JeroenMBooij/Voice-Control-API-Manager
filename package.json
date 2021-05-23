@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "concurrently \"tsoa spec-and-routes\" \"tsoa swagger\" \"tsc --watch\" \"node dist/app.js\"",
     "debug": "concurrently \"tsc -p .\" \"tsoa spec-and-routes\" \"tsc -p .\" \"tsoa swagger\"",
-    "start": "npm install && concurrently \"tsc -p .\" \"tsoa spec-and-routes\" \"tsc -p .\" \"tsoa swagger\" && node dist/app.js",
+    "postinstall": "concurrently \"tsc -p .\" \"tsoa spec-and-routes\" \"tsoa swagger\" && node dist/app.js",
     "build": "tsc -p .",
     "tsoa": "tsoa spec-and-routes && tsc",
     "swagger": "tsoa swagger",
