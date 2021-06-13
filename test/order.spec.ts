@@ -39,15 +39,6 @@ describe('User Order tests', function() {
 
     });
 
-    it("Execute command", async () => {
-        testMaster.token = testMaster.admintoken;
-        await testMaster.makePostRequest("/admin/commands/create", DummyOrderRepository.fourthOrder);
-        
-        let response = await testMaster.uploadFile("/orders/execute-voice-command", "voiceCommand", 
-        "test/dummy-repository/command-files/redbonedog.wav");
-
-        console.log(response.body);
-    });
 
     after(async () => {
         await testMaster.stopServer();

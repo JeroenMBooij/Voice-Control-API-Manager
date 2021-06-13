@@ -11,7 +11,8 @@
     "build": "tsc -p .",
     "tsoa": "tsoa spec-and-routes && tsc",
     "swagger": "tsoa swagger",
-    "test": "mocha --check-leaks -r ts-node/register \"test/**/*.spec.ts\" --exit --timeout 10000"
+    "test": "mocha --check-leaks -r ts-node/register \"test/**/*.spec.ts\" --exit --timeout 10000",
+    "testcoverage": "nyc --reporter=html npm test"
   },
   "engines": {
     "node": "14.x"

@@ -97,4 +97,30 @@ export let secondOrder = {
       ]
     }
   }
+
+  export let travelOrder = {
+    "price": 20,
+    "command": "show travel locations to {location}",
+    "action": {
+      "host": "https://skyscanner-skyscanner-flight-search-v1.p.rapidapi.com",
+      "method": "GET",
+      "requestLine": "/apiservices/autosuggest/v1.0/UK/GBP/en-GB/?query={location}",
+      "queryParameters": [
+        {
+          "key": "location",
+          "value": "Stockholm"
+        }
+      ],
+      "headers": [
+        {
+          "key": "x-rapidapi-key",
+          "value": "1140db894fmshf54643884726904p1853f4jsncbc3d5b0999f"
+        },
+        {
+          "key": "x-rapidapi-host",
+          "value": "skyscanner-skyscanner-flight-search-v1.p.rapidapi.com"
+        }
+      ]
+    }
+  }
   

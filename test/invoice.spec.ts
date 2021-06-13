@@ -7,13 +7,14 @@ import { InvoiceMap } from "../src/models/maps/invoice.map";
 
 var testMaster = TestMaster.getInstance();
 
-describe('Funds tests', function() {
+describe('Invoice tests', function() {
 
     before(async() => {
         testMaster.startServer();
         await testMaster.registerAdmin(DummyUserRepository.testadmin);
     });
 
+    
     it("Purchase Order", async () => {
         testMaster.token = testMaster.admintoken;
         let orderResponse = await testMaster.makePostRequest("/admin/commands/create", DummyOrderRepository.firstOrder);
@@ -24,30 +25,21 @@ describe('Funds tests', function() {
         await testMaster.registerUser(DummyUserRepository.testuser);
         let invoiceResponse = await testMaster.makePostRequest("/invoices/purchase", invoice);
 
-        expect(invoiceResponse.status).to.eql(200);
+        expect(invoiceResponse.status).to.eql(204);
     });
 
-    it("Exhaust Execute Order", async () => {
-        await testMaster.registerAdmin(DummyUserRepository.secondtestadmin);
-        let orderResponse = await testMaster.makePostRequest("/admin/commands/create", DummyOrderRepository.fourthOrder);
+    it("Insufficient funds", async () => {
+        testMaster.token = testMaster.admintoken;
+        let orderResponse = await testMaster.makePostRequest("/admin/commands/create", DummyOrderRepository.travelOrder);
         let orderId = orderResponse.body.orderId;
         let invoice = new InvoiceMap();
         invoice.orderId = orderId;
 
-        await testMaster.registerUser(DummyUserRepository.secondtestuser);
-        await testMaster.makePostRequest("/invoices/purchase", invoice);
-        for(let i = 0; i <= AppUser.DEFAULT_CALL_AMOUNT; i++)
-        {
-            let response = await testMaster.uploadFile("/orders/execute-voice-command", "voiceCommand", 
-            "test/dummy-repository/command-files/redbonedog.wav");
+        await testMaster.registerUser(DummyUserRepository.testuser);
+        let invoiceResponse = await testMaster.makePostRequest("/invoices/purchase", invoice);
 
-            if(i < AppUser.DEFAULT_CALL_AMOUNT)
-                expect(response.body.status).to.eql("success");
-            else  
-                expect(response.body.message).to.eql("No more calls left for show me a beagle dog");
-        }
+        expect(invoiceResponse.status).to.eql(400);
     });
-
 
     after(async () => {
         testMaster.stopServer();

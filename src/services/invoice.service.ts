@@ -3,6 +3,7 @@ import { PaginatedInvoices } from "../models/invoice-pagination.model";
 import { Invoice, InvoiceModel } from "../models/Invoice.model";
 import { InvoiceMap } from "../models/maps/invoice.map";
 import { UserMap } from "../models/maps/user.map";
+import { Order, OrderModel } from "../models/order.model";
 import { ApplicationUser, UserModel } from "../models/user.model";
 import { AuthenticationService } from "./authentication.service";
 import { MapperService } from "./mapper.service";
@@ -30,6 +31,8 @@ export class InvoiceService
         let invoice = MapperService.getInstance().invoiceMapToInvoice(invoicemap);
         await InvoiceModel.create(invoice);
 
+        let order: Order = await OrderModel.findOne({_id: invoicemap.orderId, adminId: user.adminId });
+        invoicemap.totalPrice = order.price;
         await UserModel.update({_id: user._id}, {$inc: { funds: (invoicemap.totalPrice * -1) }})
     }
 

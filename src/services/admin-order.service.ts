@@ -43,13 +43,13 @@ export class AdminOrderService
     {
         let order: Order = MapperService.getInstance().orderMapToOrder(ordermap);
 
-        //TODO test if order does not exist
+        delete order._id;
+        order.adminId = user._id;
         await OrderModel.findOneAndUpdate({_id: orderId, adminId: user.adminId }, order);
     }
 
     public async deleteOrder(user: ApplicationUser, orderId: String): Promise<void>
     {
-        //TODO test if order does not exist
         await OrderModel.findOneAndDelete({ _id: orderId, adminId: user.adminId });
     }
 

@@ -46,7 +46,7 @@ const models: TsoaRoute.Models = {
             "requestLine": {"dataType":"string"},
             "queryParameters": {"dataType":"array","array":{"ref":"Parameter"}},
             "headers": {"dataType":"array","array":{"ref":"Header"}},
-            "body": {"dataType":"nestedObjectLiteral","nestedProperties":{}},
+            "body": {"dataType":"any"},
         },
         "additionalProperties": false,
     },
@@ -136,6 +136,16 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "ExecutionResult": {
+        "dataType": "refObject",
+        "properties": {
+            "orderId": {"dataType":"double","required":true},
+            "interpertation": {"dataType":"string","required":true},
+            "challenge": {"dataType":"any","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 };
 const validationService = new ValidationService(models);
 
@@ -212,6 +222,29 @@ export function RegisterRoutes(app: express.Router) {
 
 
             const promise = controller.GetPaginatedUsers.apply(controller, validatedArgs as any);
+            promiseHandler(controller, promise, response, undefined, next);
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.get('/admins/get/id',
+            authenticateMiddleware([{"jwt":["Admin"]}]),
+            function (request: any, response: any, next: any) {
+            const args = {
+                    request: {"in":"request","name":"request","required":true,"dataType":"object"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+            } catch (err) {
+                return next(err);
+            }
+
+            const controller = new AdminAccountController();
+
+
+            const promise = controller.GetAdminId.apply(controller, validatedArgs as any);
             promiseHandler(controller, promise, response, undefined, next);
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -527,6 +560,30 @@ export function RegisterRoutes(app: express.Router) {
 
 
             const promise = controller.GetOrder.apply(controller, validatedArgs as any);
+            promiseHandler(controller, promise, response, undefined, next);
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.get('/orders/:orderId/action',
+            authenticateMiddleware([{"jwt":["Admin","User"]}]),
+            function (request: any, response: any, next: any) {
+            const args = {
+                    request: {"in":"request","name":"request","required":true,"dataType":"object"},
+                    orderId: {"in":"path","name":"orderId","required":true,"dataType":"string"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+            } catch (err) {
+                return next(err);
+            }
+
+            const controller = new OrderController();
+
+
+            const promise = controller.GetOrderAction.apply(controller, validatedArgs as any);
             promiseHandler(controller, promise, response, undefined, next);
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa

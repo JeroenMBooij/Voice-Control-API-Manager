@@ -23,6 +23,9 @@ import { Balance } from "../../models/balance.model";
 @Route("funds")
 export class FundsController extends Controller 
 {
+    /**
+     * <b>Increase how much you have to spend on commands</b>
+     */
     @Post('deposit')
     @Security(AppUser.JWT_SECURITY, [AppUser.ADMIN_ROLE, AppUser.USER_ROLE])
     public async Deposit(@Request() request: express.Request, @Body() deposit: Balance): Promise<any> 
@@ -32,6 +35,9 @@ export class FundsController extends Controller
         await FundsService.getInstance().deposit(applicationUser, deposit.value);
     }
 
+    /**
+     * <b>Get the current state of how much you have to spend on commands</b> 
+     */
     @Get('balance')
     @Security(AppUser.JWT_SECURITY, [AppUser.ADMIN_ROLE, AppUser.USER_ROLE])
     public GetBalance(@Request() request: express.Request): number 

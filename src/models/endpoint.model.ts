@@ -21,8 +21,7 @@ export class Endpoint
     @prop({ type: () => Header })
     public headers?: Header[];
 
-    @prop({ type: () => Schema.Types.Mixed })
-    public body?: {};
+    public body?: any;
 
     public get url(): string
     {

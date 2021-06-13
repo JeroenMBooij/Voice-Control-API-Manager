@@ -40,7 +40,7 @@ export class Order
 
     public get uniqueCommand(): string
     {
-        return this.command.replace(/{(.+?)} /g, "").toLowerCase();
+        return this.command.replace(/\s?{(.+?)}/g, "").toLowerCase();
     }
     
 }

@@ -10,6 +10,9 @@ import { PaginatedOrders } from "../models/order-pagination.model";
 import { Invoice, InvoiceModel } from "../models/Invoice.model";
 import * as AppUser from "../common/constants/user.constants";
 import { Parameter } from "../models/parameter.model";
+import { ExecutionResult } from "../models/execution-result.model";
+import { exception } from "console";
+import { Endpoint } from "../models/endpoint.model";
 
 
 export class OrderService 
@@ -29,7 +32,7 @@ export class OrderService
         return OrderService.instance;
     }
 
-    public async executeOrder(user: ApplicationUser, file: any) : Promise<any>
+    public async executeOrder(user: ApplicationUser, file: any) : Promise<ExecutionResult>
     {
         OrderValidator.getInstance().validateFile(file);
         
@@ -82,9 +85,12 @@ export class OrderService
         }
         let result: any = await OrderValidator.getInstance().challengeEndpoint(order.action);
 
+        let executionResult = new ExecutionResult();
+        executionResult.orderId = order._id;
+        executionResult.interpertation = command;
+        executionResult.challenge = result;
 
-
-        return result;
+        return executionResult;
     }
     
     public async getOrders(user: ApplicationUser, startIndex: number = 0, endIndex: number = 49): Promise<PaginatedOrders>
@@ -117,6 +123,13 @@ export class OrderService
         return MapperService.getInstance().orderToOrderMap(order);
     }
 
+    public async getOrderAction(user: ApplicationUser, orderId: String): Promise<Endpoint>
+    {
+        let orderMap = await this.getOrder(user, orderId);
+
+        return orderMap.action;
+    }
+
     public async GetAdminOrderHeaderValue(adminId: number, orderId: number, headerKey: string): Promise<string>
     {
         let order: Order = await OrderModel.findOne({_id: orderId, adminId: adminId });
@@ -126,7 +139,7 @@ export class OrderService
             throw new ApiError(400, "Invalid OrderId and or adminId provided.");
         }
 
-        let headerValue = order.action.headers[headerKey];
+        let headerValue = order.action.headers.find(header => header.key == headerKey).value;
 
         if(headerValue == null)
         {
@@ -176,9 +189,8 @@ export class OrderService
     private findOrderByCommand(command: string, orders: Order[]): Order
     {
         let commandOrder: Order;
-        let commandArray = command.split(' ');
         orders.forEach(order => {
-            let currentCommandArray = commandArray;
+            let currentCommandArray = command.split(' ');
 
             order.parameterLocations.forEach(index => {
                 currentCommandArray.splice(index, 1);

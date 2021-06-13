@@ -42,6 +42,25 @@ export class TestMaster
         return response;
     }
 
+    public async makePutRequest(route: string, data: any): Promise<any>
+    {
+        let response = await request(this.app)
+            .put(route)
+            .send(data)
+            .set("x-access-token", this.token);
+        
+        return response;
+    }
+
+    public async makeDeleteRequest(route: string): Promise<any>
+    {
+        let response = await request(this.app)
+            .delete(route)
+            .set("x-access-token", this.token);
+        
+        return response;
+    }
+
     public async makeGetRequest(route: string): Promise<any>
     {
         let response = await request(this.app)

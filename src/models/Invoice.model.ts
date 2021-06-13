@@ -1,6 +1,6 @@
 import { prop, getModelForClass, Ref, pre } from '@typegoose/typegoose';
 import { ApplicationUser, UserModel } from './user.model';
-import { Order } from './order.model';
+import { Order, OrderModel } from './order.model';
 
 
 @pre<Invoice>('save', async function () {
@@ -34,12 +34,13 @@ export class Invoice
 
 const InvoiceModel = getModelForClass(Invoice);
 
-InvoiceModel.schema.path("orderId").validate(async function(orders: Order[]): Promise<boolean> {
+InvoiceModel.schema.path("orderId").validate(async function(orderId: string): Promise<boolean> {
 
-    let totalPrice = orders.map(s => s.price).reduce((a, b) => a + b);
 
     let user: ApplicationUser = new UserModel(await UserModel.findById(this.userId));
-    if(user.funds < totalPrice)
+    let order: Order = await OrderModel.findOne({_id: orderId, adminId: user.adminId });
+
+    if(user.funds < order.price)
     {
         this.invalidate("orders", "Insufficient funds");
         return false;

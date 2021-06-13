@@ -15,8 +15,9 @@ describe('Funds tests', function() {
     });
 
     it("check registration funds", async () => {
-        let response = await testMaster.makePostRequest("/admin/commands/create", DummyOrderRepository.firstOrder);
-        let orderId = response.body.
+        await testMaster.registerUser(DummyUserRepository.testuser);
+        let response = await testMaster.makeGetRequest("/funds/balance");
+
         expect(response.body).to.eql(AppUser.REGISTRATION_BONUS);
     });
 

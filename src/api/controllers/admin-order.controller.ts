@@ -24,8 +24,12 @@ import { OrderResult } from "../../models/order-result.model";
 export class AdminOrderController extends Controller 
 {
 
+    /**
+     * <b>Create an order by defining a command with parameters </b> <br> 
+     * <b> Match the parameters to a dummy query to test the command </b>
+     */
     @Post('create')
-    @SuccessResponse('201', 'Created')
+    @SuccessResponse('201', 'Returns the result of your test request')
     public async CreateCommand(@Request() request: express.Request, @Body() ordermap: OrderMap): Promise<OrderResult> 
     {
         const applicationUser = (request as any).applicationUser as ApplicationUser;
@@ -37,6 +41,9 @@ export class AdminOrderController extends Controller
         return challengeResult;
     }
 
+    /**
+     * <b>Change the data of a command you have created before</b>
+     */
     @Put('update/{orderId}')
     public async UpdateCommand(@Request() request: express.Request, orderId: String, @Body() ordermap: OrderMap): Promise<void> 
     {
@@ -45,6 +52,9 @@ export class AdminOrderController extends Controller
         await AdminOrderService.getInstance().UpdateOrder(applicationUser, orderId, ordermap);
     }
 
+    /**
+     * <b>Delete all the data of a command you have created before</b>
+     */
     @Delete('delete/{orderId}')
     public async DeleteCommand(@Request() request: express.Request, orderId: String): Promise<void> 
     {
