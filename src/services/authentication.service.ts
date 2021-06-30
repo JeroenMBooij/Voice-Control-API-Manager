@@ -6,6 +6,7 @@ import { MapperService } from "./mapper.service";
 import * as AppUser from "../common/constants/user.constants"
 import { Credentials } from "../models/credentials.model";
 import { PaginatedUsers } from "../models/user-pagination.model";
+import { ApiError } from "../common/extensions/error.extention";
 
 export class AuthenticationService 
 {
@@ -58,7 +59,6 @@ export class AuthenticationService
     private async register(usermap: UserMap): Promise<ApplicationUser>
     {
         let user: ApplicationUser = MapperService.getInstance().userMapToAppUser(usermap);
-        user.funds = AppUser.REGISTRATION_BONUS;
 
         user = await UserModel.create(user);
 
@@ -78,7 +78,46 @@ export class AuthenticationService
 
         return user;
     }
+
+    public async updateAdmin(user: ApplicationUser, adminId: number, updatedUserMap: UserMap): Promise<void>
+    {
+        if(user._id != adminId)
+            throw new ApiError(403, "You are not authorized to update this account");
+
+        let updatedUser: ApplicationUser = MapperService.getInstance().userMapToAppUser(updatedUserMap);
+
+        await UserModel.findOneAndUpdate({ _id: adminId }, updatedUser);
+
+        let users: ApplicationUser[] = await UserModel.find({adminId: adminId})
+
+        new Promise((resolve, reject) => {
+            users.forEach(async user => {
+                user.adminId = null;
+                await UserModel.findOneAndUpdate({ _id: user._id }, updatedUser);
+            });
+
+            resolve("users updated");
+        })
+    }
+
+    public async updateUser(user: ApplicationUser, userId: number, updatedUserMap: UserMap): Promise<void>
+    {
+        if(user._id != userId)
+            throw new ApiError(403, "You are not authorized to update this account");
+
+        let updatedUser: ApplicationUser = MapperService.getInstance().userMapToAppUser(updatedUserMap);
+
+        await UserModel.findOneAndUpdate({ _id: userId }, updatedUser);
+    }
     
+    public async deleteUser(user: ApplicationUser, userId: number): Promise<void>
+    {
+        if(user._id != userId)
+            throw new ApiError(403, "You are not authorized to delete this account");
+
+        await UserModel.findByIdAndDelete({ _id: userId });
+    }
+
     public async GetPaginatedUsersByAdmin(admin: ApplicationUser, startIndex: number = 0, endIndex: number = 49): Promise<PaginatedUsers>
     {
         let users: ApplicationUser[] = new Array();

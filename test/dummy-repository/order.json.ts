@@ -3,7 +3,6 @@ import { OrderMap } from "../../src/models/maps/order.map";
 import { Parameter } from "../../src/models/parameter.model";
 
 export let firstOrder = {
-    "price": 1,
     "command": "Show me a {breed} doggie",
     "action": {
       "host": "https://dog.ceo",
@@ -19,7 +18,6 @@ export let firstOrder = {
   }
 
 export let secondOrder = {
-    "price": 1,
     "command": "Show me a {breed} cat",
     "action": {
       "host": "https://dog.ceo",
@@ -35,7 +33,6 @@ export let secondOrder = {
   }
 
   export let thirdOrder = {
-    "price": 1,
     "command": "Show me a {breed} test",
     "action": {
       "host": "https://dog.ceo",
@@ -51,7 +48,6 @@ export let secondOrder = {
   }
 
   export let fourthOrder = {
-    "price": 1,
     "command": "Show me a {breed} dog",
     "action": {
       "host": "https://dog.ceo",
@@ -67,7 +63,6 @@ export let secondOrder = {
   }
 
   export let orderWithNumbers = {
-    "price": 1,
     "command": "Show me a {breed} test12",
     "action": {
       "host": "https://dog.ceo",
@@ -83,7 +78,6 @@ export let secondOrder = {
   }
 
   export let orderWithSpacesInParameter = {
-    "price": 1,
     "command": "Show me a {bre ed} test",
     "action": {
       "host": "https://dog.ceo",
@@ -99,7 +93,6 @@ export let secondOrder = {
   }
 
   export let travelOrder = {
-    "price": 20,
     "command": "show travel locations to {location}",
     "action": {
       "host": "https://skyscanner-skyscanner-flight-search-v1.p.rapidapi.com",

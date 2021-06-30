@@ -8,8 +8,9 @@ import
     Body,
     Security,
     Get,
-    SuccessResponse,
-    Response
+    Delete, 
+    Put,
+    SuccessResponse
 } from "tsoa";
 import * as express from "express";
 import { Credentials } from "../../models/credentials.model";
@@ -19,20 +20,24 @@ import * as AppUser from "../../common/constants/user.constants";
 import { OrderService } from "../../services/order.service";
 import { PaginatedUsers } from "../../models/user-pagination.model";
 import { ApplicationUser } from "../../models/user.model";
+import { } from "../../common/constants/http-methods.constants";
 
 @Tags("Admin")
-@Route("admins")
+@Route("admin")
 export class AdminAccountController extends Controller 
 {
     /**
      * <b>stores user information about the admin in our database</b>
      * @summary create an admin account
      */
-    @Post('register')
+    @Post()
     @SuccessResponse('201', 'Returns a Jwt Token')
     public async RegisterAdmin(@Body() user: UserMap): Promise<string> 
     {
-        return await AuthenticationService.getInstance().registerAdmin(user);
+        let token = await AuthenticationService.getInstance().registerAdmin(user);
+        this.setStatus(201);
+
+        return token;
     }
 
     /**
@@ -46,7 +51,40 @@ export class AdminAccountController extends Controller
     }
 
     /**
+     * <b>stores user information about the admin in our database</b>
+     * @summary update an admin account
+     */
+    @Put('{adminId}')
+    @Security(AppUser.JWT_SECURITY, [AppUser.ADMIN_ROLE])
+    @SuccessResponse('204', 'The admin will have the updated values in our database')
+    public async UpdateAdmin(@Request() request: express.Request, @Body() user: UserMap, adminId: number): Promise<void> 
+    {
+        const applicationUser = (request as any).applicationUser as ApplicationUser;
+        await AuthenticationService.getInstance().updateAdmin(applicationUser, adminId, user);
+
+        this.setStatus(204);
+    }
+
+    /**
+    * <b>The admin will be deleted from our database</b>
+    * <b>The users belonging to the admin will have to register under a new admin to continue using this API</b>
+    * @summary delete an admin account
+    */
+    @Delete('{adminId}')
+    @Security(AppUser.JWT_SECURITY, [AppUser.ADMIN_ROLE])
+    @SuccessResponse('204', 'The admin is deleted from our database')
+    public async DeleteAdmin(@Request() request: express.Request, @Body() user: UserMap, adminId: number): Promise<void> 
+    {
+        const applicationUser = (request as any).applicationUser as ApplicationUser;
+
+        await AuthenticationService.getInstance().deleteUser(applicationUser, adminId);
+
+        this.setStatus(204);
+    }
+
+    /**
      * <b> Get a list of users registered under your admin token</b>
+     * * @summary SaaS users
      */
     @Get('users/start/{startIndex}/end/{endIndex}')
     @Security(AppUser.JWT_SECURITY, [AppUser.ADMIN_ROLE])
@@ -56,28 +94,7 @@ export class AdminAccountController extends Controller
         return AuthenticationService.getInstance().GetPaginatedUsersByAdmin(applicationUser, startIndex, endIndex);
     }
 
-    @Get('/get/id')
-    @Security(AppUser.JWT_SECURITY, [AppUser.ADMIN_ROLE])
-    public async GetAdminId(@Request() request: express.Request): Promise<number>
-    {
-        const applicationUser = (request as any).applicationUser as ApplicationUser;
-        return applicationUser._id;
-    }
 
-    /**
-     * 
-     * @param adminId the id of the admin account you want to follow
-     * @param orderId the id of the order you are interested in
-     * @param headerKey the request header key of an order
-     */
-    @Security(AppUser.JWT_SECURITY, [AppUser.ADMIN_ROLE, AppUser.USER_ROLE])
-    @Get('{adminId}/orders/{orderId}/header/{headerKey}')
-    @SuccessResponse('200', 'The corresponding header value')
-    @Response("400", "Validation error")
-    public async GetAdminOrderHeaderValue(adminId: number, orderId: number, headerKey: string): Promise<string>
-    {
-        return await OrderService.getInstance().GetAdminOrderHeaderValue(adminId, orderId, headerKey);
-    }
 
     
     

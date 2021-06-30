@@ -15,24 +15,23 @@ export default function useExceptionFilter(app: Express): void {
     // error handler will print stacktrace only in development
     app.use(function errorHandler(
         error: unknown,
-        req: Request,
-        res: Response,
+        request: Request,
+        response: Response,
         next: NextFunction
       ): Response | void {
         if (error instanceof ValidateError) {
-            console.warn(`Caught Validation Error for ${req.path}:`, error.fields);
-            return res.status(422).json({
-              message: "Validation Failed"
+            return response.status(422).json({
+              message: `Caught Validation Error for ${request.path}: ${error.fields}`
             });
         }
         if (error instanceof ApiError) {
-          console.warn(`Caught Validation Error for ${req.path}:`, error.name);
-          return res.status(error.status).json({
+          console.warn(`Caught Validation Error for ${request.path}:`, error.name);
+          return response.status(error.status).json({
             message: error.message
           });
         }
         if (error instanceof Error) {
-          return res.status(500).json({
+          return response.status(500).json({
             message: error.message,
           });
         }

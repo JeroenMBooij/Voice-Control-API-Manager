@@ -1,6 +1,5 @@
-import { Ref } from "@typegoose/typegoose";
-import { Invoice } from "../models/Invoice.model";
-import { InvoiceMap } from "../models/maps/invoice.map";
+import { Endpoint } from "../models/endpoint.model";
+import { EndpointMap } from "../models/maps/endpoint.map";
 import { OrderMap } from "../models/maps/order.map";
 import { UserMap } from "../models/maps/user.map";
 import { Order, OrderModel } from "../models/order.model";
@@ -51,9 +50,8 @@ export class MapperService
     public userMapToAppUser(usermap: UserMap): ApplicationUser
     {
         if(usermap == undefined)
-        {
             return undefined;
-        }
+        
 
         let user = new ApplicationUser();
         user._id = usermap._id;
@@ -73,9 +71,7 @@ export class MapperService
     public async userArrayToUserMapArray(users: ApplicationUser[]): Promise<UserMap[]>
     {
         if(users == undefined)
-        {
             return undefined;
-        }
 
         let userMaps: UserMap[] = new Array();
 
@@ -90,9 +86,8 @@ export class MapperService
     public userMapArrayToUserArray(userMaps: UserMap[]): ApplicationUser[]
     {
         if(userMaps == undefined)
-        {
             return undefined;
-        }
+        
 
         let users: ApplicationUser[] = new Array();
 
@@ -106,16 +101,13 @@ export class MapperService
     public orderMapToOrder(ordermap: OrderMap): Order
     {
         if(ordermap == undefined)
-        {
             return undefined;
-        }
 
         let order = new Order()
         order._id = ordermap._id;
         order.adminId = ordermap.adminId;
         order.command = ordermap.command;
-        order.action = ordermap.action;
-        order.price = ordermap.price;
+        order.action = this.endpointMapToEndPoint(ordermap.action);
 
         return order;
     }
@@ -123,27 +115,50 @@ export class MapperService
     public orderToOrderMap(order: Order): OrderMap
     {
         if(order == undefined)
-        {
             return undefined;
-        }
+        
 
         let ordermap = new OrderMap();
         ordermap._id = order._id;
         ordermap.adminId = order.adminId.valueOf() as number;
         ordermap.command = order.command;
         ordermap.action = order.action;
-        ordermap.price = order.price;
 
         return ordermap;
+    }
+    
+    public endpointToEndpointMap(action: EndpointMap): EndpointMap
+    {
+        let actionMap = new Endpoint();
+        actionMap.host = action.host;
+        actionMap.method = action.method;
+        actionMap.requestLine = action.requestLine;
+        actionMap.queryParameters = action.queryParameters;
+        actionMap.headers = action.headers;
+        actionMap.body = action.body;
+
+        return actionMap;
+    }
+
+    public endpointMapToEndPoint(actionMap: EndpointMap): Endpoint
+    {
+        let action = new Endpoint();
+        action.host = actionMap.host;
+        action.method = actionMap.method;
+        action.requestLine = actionMap.requestLine;
+        action.queryParameters = actionMap.queryParameters;
+        action.headers = actionMap.headers;
+        action.body = actionMap.body;
+
+        return action;
     }
 
     
     public orderArrayToOrderMapArray(orders: Order[]): OrderMap[]
     {
         if(orders == undefined)
-        {
             return undefined;
-        }
+        
 
         let ordermaps: OrderMap[] = new Array();
 
@@ -157,9 +172,8 @@ export class MapperService
     public orderMapsArrayToOrderArray(ordermaps: OrderMap[]): Order[]
     {
         if(ordermaps == undefined)
-        {
             return undefined;
-        }
+        
 
         let orders: Order[] = new Array();
 
@@ -168,69 +182,6 @@ export class MapperService
         });
 
         return orders;
-    }
-
-    public invoiceMapToInvoice(invoicemap: InvoiceMap): Invoice
-    {
-        if(invoicemap == undefined)
-        {
-            return undefined;
-        }
-
-        let invoice = new Invoice()
-        invoice._id = invoicemap._id;
-        invoice.userId = invoicemap.userId;
-        invoice.orderId = invoicemap.orderId;
-
-        return invoice;
-    }
-
-    public invoiceToInvoiceMap(invoice: Invoice): InvoiceMap
-    {
-        if(invoice == undefined)
-        {
-            return undefined;
-        }
-
-        let invoicemap = new InvoiceMap();
-        invoicemap._id = invoice._id;
-        invoicemap.userId = invoice.userId.valueOf() as number;
-        invoicemap.orderId = invoice.orderId;
-
-        return invoicemap;
-    }
-
-    
-    public invoiceArrayToInvoiceMapArray(invoices: Invoice[]): InvoiceMap[]
-    {
-        if(invoices == undefined)
-        {
-            return undefined;
-        }
-
-        let invoicemaps: InvoiceMap[] = new Array();
-
-        invoices.forEach((invoice: Invoice) => {
-            invoicemaps.push(this.invoiceToInvoiceMap(invoice));
-        });
-
-        return invoicemaps;
-    }
-
-    public invoiceMapsArrayToInvoiceArray(invoicemaps: InvoiceMap[]): Invoice[]
-    {
-        if(invoicemaps == undefined)
-        {
-            return undefined;
-        }
-
-        let invoices: Invoice[] = new Array();
-
-        invoicemaps.forEach((invoicemap: InvoiceMap) => {
-            invoices.push(this.invoiceMapToInvoice(invoicemap));
-        });
-
-        return invoices;
     }
 
 }

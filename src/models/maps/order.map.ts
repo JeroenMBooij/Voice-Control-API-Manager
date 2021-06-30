@@ -1,4 +1,5 @@
 import { Endpoint } from "../endpoint.model";
+import { EndpointMap } from "./endpoint.map";
 
 export class OrderMap
 {
@@ -6,10 +7,8 @@ export class OrderMap
 
     public adminId?: number;
 
-    public price!: number;
-
     public command!: string;
 
-    public  action!: Endpoint;
+    public  action!: EndpointMap;
     
 }

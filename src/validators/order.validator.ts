@@ -48,17 +48,20 @@ export class OrderValidator
         });
     }
 
-    public validateCommandToBody(commandParameters: RegExpMatchArray, body: object)
+    public validateCommandToBody(isJson: boolean, commandParameters: RegExpMatchArray, body: any)
     {
         let bodyParameters: string[] = new Array();
-        this.traverseBody(body, bodyParameters);
-
-        commandParameters.forEach((commandParameter: string) =>
+        if(isJson)
+            this.traverseBody(body, bodyParameters);
+        else
         {
+            bodyParameters = body.match(/{.*?}/g);
+        }
+
+        commandParameters.forEach((commandParameter: string) => {
             if(!bodyParameters.includes(commandParameter))
-            {
                 throw new Error(`${commandParameter} is missing from Request Body`);
-            }
+            
         });
     }
     
@@ -94,15 +97,15 @@ export class OrderValidator
                     break;
                 
                 case httpMethods.POST:
-                    result = await client.post(action.requestLine, action.body);
+                    result = await client.post(action.requestLine, this.bodyBuilder(action));
                     break;
                 
                 case httpMethods.PUT:
-                    result = await client.put(action.requestLine, action.body);
+                    result = await client.put(action.requestLine, this.bodyBuilder(action));
                     break;
 
                 case httpMethods.PATCH:
-                    result = await client.patch(action.requestLine, action.body);
+                    result = await client.patch(action.requestLine, this.bodyBuilder(action));
                     break;
                 
                 case httpMethods.DELETE:
@@ -136,6 +139,32 @@ export class OrderValidator
         }
 
         return action.requestLine;
+    }
+
+    private bodyBuilder(action: Endpoint): any
+    {
+        let body = action.body;
+        if(action.headers.filter(s => s.value == "application/x-www-form-urlencoded").length > 0) {
+            action.queryParameters.forEach((parameter: Parameter) =>
+            {
+                let test = `{${parameter.key}}`;
+                body = (body as string).replace(test, parameter.value.replace(' ', "%2C%20"));
+            });
+        }
+        else
+        {
+            Object.keys(action.body).forEach((key) => {
+                let keyDescription = action.body[key];
+
+                let value = action.queryParameters.filter(s => s.key == keyDescription)[0];
+
+                if(value)
+                    body[key] = value;
+            });
+        }
+
+        
+        return body;
     }
 
     

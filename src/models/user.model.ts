@@ -2,7 +2,6 @@ import { prop, getModelForClass, pre, Ref } from '@typegoose/typegoose';
 import { Order } from './order.model';
 import * as SupportedLanguages from '../common/constants/language.constants';
 import * as AppUser from '../common/constants/user.constants';
-import { Invoice } from './Invoice.model';
 
 @pre<ApplicationUser>('save', async function () {
     while(true)
@@ -49,9 +48,6 @@ export class ApplicationUser
     @prop({ type: () => String })
     public role?: string;
 
-    @prop({ type: () => Number, required: true })
-    public funds?: number;
-
     @prop({ type: () => String })
     public language?: string;
 
@@ -60,9 +56,6 @@ export class ApplicationUser
 
     @prop({ ref: () => ApplicationUser, type: Number })
     public userIds?: ApplicationUser['_id'][];
-
-    @prop({ ref: () => ApplicationUser, type: Number })
-    public invoiceIds?: Invoice['_id'][];
 
     @prop({ ref: () => ApplicationUser, type: () => Number })
     public adminId?: ApplicationUser['_id'];

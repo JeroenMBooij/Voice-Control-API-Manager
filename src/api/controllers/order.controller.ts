@@ -6,7 +6,8 @@ import
     Tags,
     Post,
     Request,
-    Security
+    Security,
+    UploadedFile
 } from "tsoa";
 import * as express from "express";
 import multer from "multer";
@@ -17,27 +18,22 @@ import { PaginatedOrders } from "../../models/order-pagination.model";
 import { ApplicationUser } from "../../models/user.model";
 import { ExecutionResult } from "../../models/execution-result.model";
 import { Endpoint } from "../../models/endpoint.model";
+import { EndpointMap } from "../../models/maps/endpoint.map";
 
 @Tags("Orders")
-@Route("orders")
+@Route("order")
 export class OrderController extends Controller 
 {
+    /**
+     *<b>Upload a command as a mono recording formatted to a wav file with 16kHz</br> An HTTP request will be made to the The endpoint corresponding to the command.</b>
+     */
     @Security(AppUser.JWT_SECURITY, [AppUser.ADMIN_ROLE, AppUser.USER_ROLE])
     @Post('execute-voice-command')
-    public async ExecuteCommand(@Request() request: express.Request): Promise<ExecutionResult> 
+    public async ExecuteCommand(@Request() request: express.Request, @UploadedFile() voiceCommand: Express.Multer.File): Promise<ExecutionResult> 
     {
-        try
-        {
-            await this.handleFile(request, "voiceCommand");
-        }
-        catch(error: any)
-        {
-            throw new Error(error);
-        }
-
         const applicationUser = (request as any).applicationUser as ApplicationUser;
 
-        return await OrderService.getInstance().executeOrder(applicationUser, (request as any).file);
+        return await OrderService.getInstance().executeOrder(applicationUser, voiceCommand);
     }
 
     /**
@@ -69,7 +65,7 @@ export class OrderController extends Controller
      */
      @Security(AppUser.JWT_SECURITY, [AppUser.ADMIN_ROLE, AppUser.USER_ROLE])
      @Get('{orderId}/action')
-     public async GetOrderAction(@Request() request: express.Request, orderId: String): Promise<Endpoint> 
+     public async GetOrderAction(@Request() request: express.Request, orderId: String): Promise<EndpointMap> 
      {
          const applicationUser = (request as any).applicationUser as ApplicationUser;
  
@@ -84,9 +80,8 @@ export class OrderController extends Controller
             multerSingle(request, undefined, async (error) =>
                 {
                     if (error)
-                    {
                         reject(error);
-                    }
+
                     resolve("File will be in request.file, it is a buffer");
                 });
         });
@@ -95,3 +90,4 @@ export class OrderController extends Controller
     
     
 }
+

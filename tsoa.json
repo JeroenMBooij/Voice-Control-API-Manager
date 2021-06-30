@@ -6,7 +6,8 @@
     ],
     "spec": {
       "basePath" : "/",
-      "description": "<b>This API facilitates custom voice commands to execute the corresponding configured API endpoint</b>",
+      "name": "Custom voice commands API",
+      "description": "<b>This API is written in Node TypeScript using the Express framework to create a restful API <br> It facilitates custom voice commands to execute the corresponding configured API endpoint created by this API's admins</b></br></br><b>Source Code: </b> <a href='https://github.com/JeroenMBooij/CloudServices_Eindopdracht/tree/main/src'>Go To Github</a> </br> This project was part of a school assignment where we could build any API we wanted to with the only rule being that the API must use and process an already existing public API <br> This API uses the Microsoft Speech API to translate speech to text",
       "outputDirectory": "dist/api/public",
       "specVersion": 3,
       "securityDefinitions": {
@@ -14,32 +15,6 @@
             "type": "apiKey",
             "name": "x-access-token",
             "in": "header"
-        }
-      },
-      "specMerging": "recursive",
-      "spec":{
-        "paths": {
-          "/orders/execute-voice-command": {
-            "post": {
-              "description": "<b>Upload a command as a mono recording formatted to a wav file with 16kHz</b> <br> <b>The endpoint corresponding to the command will be executed.</b>",
-              "requestBody": {
-                "required": true,
-                "content": {
-                  "multipart/form-data": {
-                    "schema": {
-                      "type":"object",
-                      "properties":{
-                        "voiceCommand":{
-                          "type": "string",
-                          "format": "binary"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
         }
       }
     },

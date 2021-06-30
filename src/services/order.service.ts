@@ -7,12 +7,9 @@ import { ApiError } from "../common/extensions/error.extention";
 import { OrderMap } from "../models/maps/order.map";
 import { MapperService } from "./mapper.service";
 import { PaginatedOrders } from "../models/order-pagination.model";
-import { Invoice, InvoiceModel } from "../models/Invoice.model";
-import * as AppUser from "../common/constants/user.constants";
-import { Parameter } from "../models/parameter.model";
 import { ExecutionResult } from "../models/execution-result.model";
-import { exception } from "console";
 import { Endpoint } from "../models/endpoint.model";
+import { EndpointMap } from "../models/maps/endpoint.map";
 
 
 export class OrderService 
@@ -39,50 +36,20 @@ export class OrderService
         this.speechConfig.speechRecognitionLanguage = user.language;
         let command: string = (await this.speechToText(file.buffer.slice(0))).replace(".", "");
         
-        
         let orders: Order[] = new Array();
-        let invoices: Invoice[] = new Array();
-        if(user.role === AppUser.ADMIN_ROLE)
-        {
-            let garbageOrders = await OrderModel.find({adminId: user._id });
-            garbageOrders.forEach(item => {
-                orders.push(new OrderModel(item));
-            });
-        }
-        else
-        {
-            let garbage = await InvoiceModel.find({_id: { $in: user.invoiceIds } });
-            garbage.forEach(item => {
-                invoices.push(new InvoiceModel(item));
-            });
-            
-            let garbageOrders = await OrderModel.find({_id: { $in: invoices.map(s => s.orderId) } });
-            garbageOrders.forEach(item => {
-                orders.push(new OrderModel(item));
-            });
-            
-        }
+        let garbageOrders = await OrderModel.find({adminId: user.adminId });
+        garbageOrders.forEach(item => {
+            orders.push(new OrderModel(item));
+        });
 
         let order = this.findOrderByCommand(command, orders);
 
         if(order === undefined)
-        {
             throw new ApiError(400, `No purchased order found for the command: ${command}`);
-        }
-
+        
         
         this.setOrderQueryParameters(order, command);
 
-        let invoice = invoices.find(s => s.orderId === order._id);
-        if(invoice !== undefined)
-        {
-            if(invoice.callsLeft === 0)
-            {
-                throw new ApiError(400, `No more calls left for ${command}`);
-            }
-
-            invoice.callsLeft--; 
-        }
         let result: any = await OrderValidator.getInstance().challengeEndpoint(order.action);
 
         let executionResult = new ExecutionResult();
@@ -116,18 +83,17 @@ export class OrderService
         let order: Order = await OrderModel.findOne({_id: orderId, adminId: user.adminId });
 
         if(order == null)
-        {
             throw new ApiError(400, "Invalid OrderId provided.");
-        }
+        
 
         return MapperService.getInstance().orderToOrderMap(order);
     }
 
-    public async getOrderAction(user: ApplicationUser, orderId: String): Promise<Endpoint>
+    public async getOrderAction(user: ApplicationUser, orderId: String): Promise<EndpointMap>
     {
         let orderMap = await this.getOrder(user, orderId);
 
-        return orderMap.action;
+        return MapperService.getInstance().endpointToEndpointMap(orderMap.action);
     }
 
     public async GetAdminOrderHeaderValue(adminId: number, orderId: number, headerKey: string): Promise<string>
@@ -135,16 +101,14 @@ export class OrderService
         let order: Order = await OrderModel.findOne({_id: orderId, adminId: adminId });
 
         if(order === undefined)
-        {
             throw new ApiError(400, "Invalid OrderId and or adminId provided.");
-        }
+        
 
         let headerValue = order.action.headers.find(header => header.key == headerKey).value;
 
         if(headerValue == null)
-        {
             throw new ApiError(400, "Invalid header key provided");
-        }
+        
 
         return headerValue;
     }

@@ -26,9 +26,6 @@ export class Order
     @prop({ ref: 'ApplicationUser', type: () => Number, required: true })
     public adminId: Ref<ApplicationUser>;
 
-    @prop({ type: () => Number, required: true, default: 0 })
-    public price!: number;
-
     @prop({ type: () => String, required: true })
     public command!: string;
 
@@ -99,10 +96,12 @@ OrderModel.schema.path('command').validate(function(value: string){
     }
 
     // Make sure there are no spaces inside de parameters
-    invalidCommands = value.match(/{.*\s.*}/g); 
-    if(invalidCommands)
+    let test = value.match(/{.*\s.*}/g).toString(); 
+    if(test)
     {
-       this.invalidate("command", "A command parameter can not contain spaces");
+        let count: RegExpMatchArray | null = test.match(/{.*?}/g);
+        if(count.length == 1)
+            this.invalidate("command", "A command parameter can not contain spaces");
     }
 });
 
@@ -128,7 +127,8 @@ OrderModel.schema.path("action").validate(function(action: Endpoint): boolean {
 
     if(action.body !== undefined)
     {
-        OrderValidator.getInstance().validateCommandToBody(commandParameters, action.body);
+        let isJson = action.headers.filter(s => s.value == "application/x-www-form-urlencoded").length == 0;
+        OrderValidator.getInstance().validateCommandToBody(isJson, commandParameters, action.body);
     }
 });
 
@@ -144,37 +144,16 @@ OrderModel.schema.path("action").validate(function(action: Endpoint): boolean {
             break;
 
         case httpMethods.POST:
-            if(action.queryParameters !== undefined)
-            {
-                this.invalidate("queryParameters", "Query strings are not supported in POST method");
-                return false;
-            }
-            break;
-        
         case httpMethods.PUT:
-            if(action.queryParameters !== undefined)
-            {
-                this.invalidate("queryParameters", "Query strings are not supported in PUT method");
-                return false;
-            }
-            break;
-
         case httpMethods.PATCH:
-            if(action.queryParameters !== undefined)
-            {
-                this.invalidate("queryParameters", "Query strings are not supported in Patch method");
-                return false;
-            }
-            break;
-        
         case httpMethods.DELETE:
-            if(action.body !== undefined)
+            let invalidRequestLine: RegExpMatchArray | null = action.requestLine.match(/{.*?}/g);
+            if(invalidRequestLine)
             {
-                this.invalidate("body", "Request body is not supported in DELETE method");
+                this.invalidate("queryParameters", `Query strings are not supported in ${action.method} methods`);
                 return false;
             }
             break;
-        
         default:
             this.invalidate("method", `${action.method.toUpperCase()} is not a valid Http method.`);
             return false;

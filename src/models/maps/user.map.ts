@@ -13,8 +13,6 @@ export class UserMap
     public lastname?: string;
 
     public role?: string;
-    
-    public balance?: number;
 
     public language?: string;
 
