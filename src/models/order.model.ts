@@ -96,7 +96,7 @@ OrderModel.schema.path('command').validate(function(value: string){
     }
 
     // Make sure there are no spaces inside de parameters
-    let test = value.match(/{.*\s.*}/g).toString(); 
+    let test = value.match(/{.*\s.*}/g)?.toString(); 
     if(test)
     {
         let count: RegExpMatchArray | null = test.match(/{.*?}/g);
