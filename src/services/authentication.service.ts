@@ -136,6 +136,30 @@ export class AuthenticationService
         return pagUsers;
     }
 
+    
+    public async GetPaginatedAdmins(startIndex: number, endIndex: number): Promise<PaginatedUsers>
+    {
+        let users: ApplicationUser[] = new Array();
+        let garbage = await UserModel.find({_id: { $ne: null } });
+        garbage.forEach(item => {
+            users.push(new UserModel(item));
+        });
+
+        let pagUsers = new PaginatedUsers();
+        pagUsers.total = users.length;
+
+        users.forEach(user => {
+            delete user.orders;
+        })
+
+        users = users.slice(startIndex, endIndex);
+        
+        pagUsers.users = await MapperService.getInstance().userArrayToUserMapArray(users);
+
+        return pagUsers;
+    }
+
+
     public async GetUsersByAdmin(admin: ApplicationUser): Promise<UserMap[]>
     {
         let users: ApplicationUser[] = new Array();

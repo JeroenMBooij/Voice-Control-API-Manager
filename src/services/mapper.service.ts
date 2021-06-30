@@ -32,11 +32,10 @@ export class MapperService
         usermap.password = user.password;
 
         let orders: Order[] = new Array();
-        user.orders.forEach(order => orders.push(new OrderModel(order)));
-
-        for(const orderId in user.orders)
+        for(let order in user.orders)
         {
-            orders.push(new OrderModel(await OrderModel.findById(orderId)));
+            let garbageOrder = await OrderModel.findById(order);
+            orders.push(new OrderModel(garbageOrder))
         }
 
         usermap.orders = this.orderArrayToOrderMapArray(orders);
@@ -116,15 +115,21 @@ export class MapperService
     {
         if(order == undefined)
             return undefined;
-        
 
-        let ordermap = new OrderMap();
-        ordermap._id = order._id;
-        ordermap.adminId = order.adminId.valueOf() as number;
-        ordermap.command = order.command;
-        ordermap.action = order.action;
+        try
+        {
+            let ordermap = new OrderMap();
+            ordermap._id = order._id;
+            ordermap.adminId = order.adminId.valueOf() as number;
+            ordermap.command = order.command;
+            ordermap.action = order.action;
 
-        return ordermap;
+            return ordermap;
+        }
+        catch
+        {
+            return null;
+        }
     }
     
     public endpointToEndpointMap(action: EndpointMap): EndpointMap

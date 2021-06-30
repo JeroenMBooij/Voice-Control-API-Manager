@@ -83,8 +83,18 @@ export class AdminAccountController extends Controller
     }
 
     /**
+     * <b> Get a list of admins</b>
+     * @summary SaaS admin
+     */
+     @Get('/start/{startIndex}/end/{endIndex}')
+     public async GetPaginatedAdmins(startIndex?: number, endIndex?: number): Promise<PaginatedUsers>
+     {
+         return AuthenticationService.getInstance().GetPaginatedAdmins(startIndex, endIndex);
+     }
+
+    /**
      * <b> Get a list of users registered under your admin token</b>
-     * * @summary SaaS users
+     * @summary SaaS users
      */
     @Get('users/start/{startIndex}/end/{endIndex}')
     @Security(AppUser.JWT_SECURITY, [AppUser.ADMIN_ROLE])

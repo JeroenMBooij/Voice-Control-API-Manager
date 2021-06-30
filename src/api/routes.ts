@@ -227,6 +227,29 @@ export function RegisterRoutes(app: express.Router) {
             promiseHandler(controller, promise, response, undefined, next);
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.get('/admin/start/:startIndex/end/:endIndex',
+            function AdminAccountController_GetPaginatedAdmins(request: any, response: any, next: any) {
+            const args = {
+                    startIndex: {"in":"path","name":"startIndex","required":true,"dataType":"double"},
+                    endIndex: {"in":"path","name":"endIndex","required":true,"dataType":"double"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+            } catch (err) {
+                return next(err);
+            }
+
+            const controller = new AdminAccountController();
+
+
+            const promise = controller.GetPaginatedAdmins.apply(controller, validatedArgs as any);
+            promiseHandler(controller, promise, response, undefined, next);
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.get('/admin/users/start/:startIndex/end/:endIndex',
             authenticateMiddleware([{"jwt":["Admin"]}]),
             function AdminAccountController_GetPaginatedUsers(request: any, response: any, next: any) {
