@@ -29,7 +29,10 @@ export class AuthenticationService
     {
         let user: ApplicationUser = await UserModel.findOne({ email: credentials.email, password: credentials.password });
 
-        return this.generateToken(user);
+        if(user)
+            return this.generateToken(user);
+        else
+            throw new ApiError(400, "Invalid credentials provided");
     }
 
     public async registerUser(adminToken: string, usermap: UserMap): Promise<string>
